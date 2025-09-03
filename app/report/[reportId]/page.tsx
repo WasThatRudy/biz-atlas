@@ -14,11 +14,12 @@ export async function generateStaticParams() {
 }
 
 interface ReportPageProps {
-  params: {
+  params: Promise<{
     reportId: string;
-  };
+  }>;
 }
 
-export default function ReportPage({ params }: ReportPageProps) {
-  return <ReportView reportId={params.reportId} />;
+export default async function ReportPage({ params }: ReportPageProps) {
+  const { reportId } = await params;
+  return <ReportView reportId={reportId} />;
 }
