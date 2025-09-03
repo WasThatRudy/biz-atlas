@@ -522,6 +522,587 @@ export default function Dashboard() {
     setCurrentPage(pageIndex);
   };
 
+  const generateReportHTML = () => {
+    if (!reportData) return '';
+
+    const currentDate = new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    const styles = `
+      <style>
+        body { 
+          font-family: Arial, sans-serif; 
+          background: #f8f5f0; 
+          margin: 0; 
+          padding: 0; 
+          color: #1a1a1a; 
+          line-height: 1.6;
+        }
+        .newsletter-container { 
+          max-width: 800px; 
+          margin: 0 auto; 
+          background: white; 
+          border: 2px solid #1a1a1a; 
+        }
+        .header { 
+          text-align: center; 
+          border-bottom: 2px solid #1a1a1a; 
+          padding: 30px 20px; 
+          background: #f8f5f0; 
+        }
+        .main-title { 
+          font-size: 2.2rem; 
+          font-weight: 900; 
+          margin-bottom: 10px; 
+          letter-spacing: -1px; 
+          color: #1a1a1a;
+        }
+        .subtitle { 
+          font-size: 0.9rem; 
+          letter-spacing: 1px; 
+          color: #666; 
+          margin-bottom: 15px; 
+        }
+        .newsletter-content { 
+          padding: 30px 20px; 
+        }
+        .section { 
+          margin-bottom: 40px; 
+        }
+        .section-title { 
+          font-size: 1.4rem; 
+          font-weight: bold; 
+          margin-bottom: 20px; 
+          border-bottom: 2px solid #1a1a1a; 
+          padding-bottom: 8px; 
+          color: #1a1a1a;
+        }
+        .content-box { 
+          border: 1px solid #ddd; 
+          padding: 20px; 
+          margin-bottom: 20px; 
+          background: #fafafa;
+        }
+        .highlight-box { 
+          border-left: 4px solid #8b5a2b; 
+          padding-left: 20px; 
+          margin-bottom: 20px; 
+          background: #f9f9f9;
+        }
+        .highlight-title { 
+          font-weight: bold; 
+          color: #8b5a2b; 
+          margin-bottom: 10px; 
+          font-size: 1.1rem;
+        }
+        .two-column { 
+          display: table; 
+          width: 100%; 
+        }
+        .column { 
+          display: table-cell; 
+          width: 48%; 
+          vertical-align: top; 
+          padding-right: 20px; 
+        }
+        .column:last-child { 
+          padding-right: 0; 
+        }
+        .text-sm { font-size: 0.9rem; }
+        .text-xs { font-size: 0.8rem; }
+        .text-lg { font-size: 1.1rem; }
+        .text-2xl { font-size: 1.4rem; }
+        .text-3xl { font-size: 1.8rem; }
+        .font-bold { font-weight: bold; }
+        .text-gray-600 { color: #666; }
+        .text-gray-500 { color: #888; }
+        .mb-2 { margin-bottom: 8px; }
+        .mb-3 { margin-bottom: 12px; }
+        .mb-4 { margin-bottom: 16px; }
+        .mb-6 { margin-bottom: 24px; }
+        .leading-relaxed { line-height: 1.6; }
+        .hashtag { 
+          background: #1a1a1a; 
+          color: #f8f5f0; 
+          padding: 4px 8px; 
+          border-radius: 3px; 
+          font-size: 0.8rem; 
+          margin: 2px; 
+          display: inline-block; 
+        }
+        .footer { 
+          text-align: center; 
+          padding: 20px; 
+          border-top: 1px solid #ddd; 
+          background: #f8f5f0; 
+          font-size: 0.9rem; 
+          color: #666; 
+        }
+        @media only screen and (max-width: 600px) {
+          .newsletter-container { margin: 0; border: none; }
+          .two-column { display: block; }
+          .column { display: block; width: 100%; padding-right: 0; margin-bottom: 20px; }
+          .main-title { font-size: 1.8rem; }
+          .newsletter-content { padding: 20px 15px; }
+        }
+      </style>
+    `;
+
+    const generateCompetitorMonitoringHTML = () => `
+      <div class="newspaper-border">
+        <h3 class="section-title">COMPETITOR MONITORING</h3>
+        <div class="content-box">
+          <h4 class="highlight-title">${reportData.competitorMonitoring?.growth_headline || 'Market Intelligence Report'}</h4>
+          <p class="text-lg leading-relaxed">${reportData.competitorMonitoring?.opportunity_analysis || 'Analysis in progress...'}</p>
+        </div>
+        
+        <div class="content-box">
+          <h4 class="text-lg font-bold mb-4">Feature Request Leaderboard</h4>
+          ${reportData.competitorMonitoring?.feature_request_leaderboard?.map((feature: any) => `
+            <div class="highlight-box">
+              <h5 class="highlight-title">${feature.feature_idea}</h5>
+              <p class="text-sm text-gray-600 mb-2">Request Frequency: ${feature.request_frequency}</p>
+              <p class="text-sm leading-relaxed">${feature.justification}</p>
+            </div>
+          `).join('') || '<p class="text-sm text-gray-600">No feature requests data available</p>'}
+        </div>
+
+        ${reportData.competitorAnalysis && reportData.competitorAnalysis.length > 0 ? `
+        <div class="content-box">
+          <h4 class="text-lg font-bold mb-4">Competitor Analysis</h4>
+          ${reportData.competitorAnalysis.map((competitor: any) => `
+            <div style="border-bottom: 1px solid #e9e4d9; padding-bottom: 15px; margin-bottom: 15px;">
+              <h5 class="font-bold text-lg mb-2">${competitor.company_name}</h5>
+              <p class="text-sm text-gray-600 mb-3 leading-relaxed">${competitor.core_product_summary}</p>
+              <div class="text-xs text-gray-500">
+                <strong>Main Weakness:</strong> ${competitor.main_weakness}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        ` : ''}
+      </div>
+    `;
+
+    const generateGrowthOpportunitiesHTML = () => `
+      <div class="newspaper-border">
+        <h3 class="section-title">GROWTH OPPORTUNITIES</h3>
+        <div class="content-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h4 class="text-2xl font-bold">Growth Score</h4>
+            <span class="text-3xl font-bold" style="color: #8b5a2b;">${reportData.growthOpportunities?.growth_score || 'N/A'}</span>
+          </div>
+          <p class="text-lg leading-relaxed">${reportData.growthOpportunities?.market_positioning_recommendation || 'Analysis in progress...'}</p>
+        </div>
+
+        <div class="content-box">
+          <h4 class="text-lg font-bold mb-4">Top Opportunities</h4>
+          ${reportData.growthOpportunities?.top_opportunities?.map((opportunity: any) => `
+            <div class="highlight-box">
+              <h5 class="highlight-title">${opportunity.opportunity_name}</h5>
+              <div class="text-sm space-y-2">
+                <p><strong>Market Demand:</strong> ${opportunity.market_demand}</p>
+                <p><strong>Competitor Gap:</strong> ${opportunity.competitor_gap}</p>
+                <p><strong>Implementation Effort:</strong> ${opportunity.implementation_effort}</p>
+                <p><strong>Revenue Potential:</strong> ${opportunity.revenue_potential}</p>
+              </div>
+            </div>
+          `).join('') || '<p class="text-sm text-gray-600">No opportunities data available</p>'}
+        </div>
+
+        <div class="content-box">
+          <h4 class="text-lg font-bold mb-4">Next Quarter Focus</h4>
+          <div style="background: #f0f0f0; padding: 15px; border-radius: 4px;">
+            <h5 class="font-bold text-lg mb-2">${reportData.growthOpportunities?.next_quarter_focus || 'Focus Area TBD'}</h5>
+            <p class="text-sm leading-relaxed">This will be the primary strategic focus for the upcoming quarter, based on market analysis and competitive positioning.</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const generateMarketingEngineHTML = () => `
+      <div class="newspaper-border">
+        <h3 class="section-title">MARKETING ENGINE</h3>
+        <div class="content-box">
+          <h4 class="text-2xl font-bold mb-4">Content Strategy Overview</h4>
+          <p class="text-lg leading-relaxed">${reportData.marketingEngine?.content_strategy_overview || 'Content strategy analysis in progress...'}</p>
+        </div>
+
+        <div class="content-box">
+          <h4 class="text-lg font-bold mb-4">Content Ideas</h4>
+          ${reportData.marketingEngine?.content_ideas?.map((content: any) => `
+            <div class="highlight-box">
+              <h5 class="highlight-title">${content.title}</h5>
+              <p class="text-sm text-gray-600 mb-2">Format: ${content.format}</p>
+              <p class="text-sm mb-2 leading-relaxed">${content.angle}</p>
+              <div class="text-xs text-gray-500">Expected Engagement: ${content.expected_engagement}</div>
+            </div>
+          `).join('') || '<p class="text-sm text-gray-600">No content ideas available</p>'}
+        </div>
+
+        <div class="content-box">
+          <h4 class="text-lg font-bold mb-4">Viral Content Opportunity</h4>
+          <div style="background: #f0f0f0; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+            <p class="text-sm leading-relaxed">${reportData.marketingEngine?.viral_content_opportunity || 'Viral content analysis in progress...'}</p>
+          </div>
+          
+          <h5 class="font-bold mb-2">Trending Hashtags</h5>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            ${reportData.marketingEngine?.trending_hashtags?.map((hashtag: string) => `
+              <span style="background: #1a1a1a; color: #f8f5f0; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem;">${hashtag}</span>
+            `).join('') || '<span class="text-sm text-gray-600">No hashtags available</span>'}
+          </div>
+        </div>
+      </div>
+    `;
+
+    const generatePriceOptimizationHTML = () => `
+      <div class="newspaper-border">
+        <h3 class="section-title">PRICE OPTIMIZATION</h3>
+        <div class="content-box">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h4 class="text-2xl font-bold">Pricing Health Score</h4>
+            <span class="text-3xl font-bold" style="color: #8b5a2b;">${reportData.priceOptimization?.pricing_health_score || 'N/A'}</span>
+          </div>
+        </div>
+
+        <div class="content-box">
+          <h4 class="text-lg font-bold mb-4">Optimization Recommendations</h4>
+          ${reportData.priceOptimization?.optimization_recommendations?.map((rec: any) => `
+            <div class="highlight-box">
+              <h5 class="highlight-title">${rec.recommendation_type}</h5>
+              <p class="text-sm mb-2 leading-relaxed">${rec.suggested_change}</p>
+              <div class="text-xs space-y-1">
+                <p><strong>Revenue Impact:</strong> ${rec.revenue_impact}</p>
+                <p><strong>Risk Level:</strong> ${rec.risk_level}</p>
+                <p><strong>Timeline:</strong> ${rec.implementation_timeline}</p>
+              </div>
+            </div>
+          `).join('') || '<p class="text-sm text-gray-600">No recommendations available</p>'}
+        </div>
+
+        <div class="content-box">
+          <h4 class="text-lg font-bold mb-4">Pricing Analysis</h4>
+          <div class="space-y-4">
+            <div style="border-bottom: 1px solid #e9e4d9; padding-bottom: 15px;">
+              <h5 class="highlight-title">Competitor Advantage</h5>
+              <p class="text-sm leading-relaxed">${reportData.priceOptimization?.competitor_advantage || 'Analysis pending'}</p>
+            </div>
+            <div style="border-bottom: 1px solid #e9e4d9; padding-bottom: 15px;">
+              <h5 class="highlight-title">Pricing Vulnerability</h5>
+              <p class="text-sm leading-relaxed">${reportData.priceOptimization?.pricing_vulnerability || 'Analysis pending'}</p>
+            </div>
+            <div>
+              <h5 class="highlight-title">Upsell Opportunities</h5>
+              <ul class="text-sm" style="list-style-type: disc; padding-left: 20px;">
+                ${reportData.priceOptimization?.upsell_opportunities?.map((opp: string) => `<li>${opp}</li>`).join('') || '<li>Analysis pending</li>'}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const generateMarketTrendsHTML = () => `
+      <div class="newspaper-border">
+        <h3 class="section-title">MARKET TRENDS</h3>
+        <div class="content-box">
+          <h4 class="text-2xl font-bold mb-4" style="color: #8b5a2b;">${reportData.marketTrends?.market_headline || 'Market Intelligence Report'}</h4>
+        </div>
+
+        <div class="content-box">
+          <h4 class="text-lg font-bold mb-4">Recent Activity Summary</h4>
+          <p class="text-sm leading-relaxed">${reportData.marketTrends?.recent_activity_summary || 'Activity analysis in progress...'}</p>
+        </div>
+
+        <div class="content-box">
+          <h4 class="text-lg font-bold mb-4">Emerging Trends</h4>
+          <p class="text-sm leading-relaxed">${reportData.marketTrends?.emerging_trends || 'Trend analysis in progress...'}</p>
+        </div>
+
+        <div class="content-box">
+          <h4 class="text-lg font-bold mb-4">Potential Threats</h4>
+          <p class="text-sm leading-relaxed">${reportData.marketTrends?.potential_threats || 'Threat analysis in progress...'}</p>
+        </div>
+
+        <div class="content-box">
+          <h4 class="text-lg font-bold mb-4">Partnership Opportunity</h4>
+          <p class="text-sm leading-relaxed">${reportData.marketTrends?.partnership_opportunity || 'Partnership analysis in progress...'}</p>
+        </div>
+      </div>
+    `;
+
+    const generateTargetPersonasHTML = () => `
+      <div class="newspaper-border">
+        <h3 class="section-title">TARGET PERSONAS</h3>
+        ${reportData.targetPersonas?.map((persona: any) => `
+          <div class="content-box">
+            <h4 class="text-2xl font-bold mb-4" style="color: #8b5a2b;">${persona.persona_name}</h4>
+            <p class="text-lg mb-4">${persona.job_title}</p>
+            <p class="text-sm text-gray-600 mb-6 leading-relaxed">${persona.demographics}</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+              <div>
+                <h5 class="font-bold mb-3 text-lg">Core Pain Points</h5>
+                <ul class="text-sm space-y-2">
+                  ${persona.core_pain_points?.map((pain: string) => `
+                    <li style="display: flex; align-items: flex-start;">
+                      <span style="color: #8b5a2b; margin-right: 8px;">•</span>
+                      <span class="leading-relaxed">${pain}</span>
+                    </li>
+                  `).join('')}
+                </ul>
+              </div>
+              
+              <div>
+                <h5 class="font-bold mb-3 text-lg">Watering Holes</h5>
+                <p class="text-sm leading-relaxed">${persona.watering_holes || 'Analysis pending...'}</p>
+              </div>
+            </div>
+          </div>
+        `).join('') || '<div class="content-box"><p class="text-sm text-gray-600">Persona analysis in progress...</p></div>'}
+      </div>
+    `;
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>The BizAtlas Chronicle - Competitive Intelligence Newsletter</title>
+        ${styles}
+      </head>
+      <body>
+        <div class="newsletter-container">
+          <!-- Newsletter Header -->
+          <div class="header">
+            <h1 class="main-title">THE BIZATLAS CHRONICLE</h1>
+            <div class="subtitle">COMPETITIVE INTELLIGENCE NEWSLETTER • ${currentDate.toUpperCase()}</div>
+            <p class="text-lg text-gray-600">Comprehensive Analysis • ${reportData.summary?.totalCompetitors || 0} Competitors Analyzed</p>
+          </div>
+
+          <!-- Newsletter Content -->
+          <div class="newsletter-content">
+            <!-- Competitor Monitoring Section -->
+            <div class="section">
+              <h2 class="section-title">🔍 COMPETITOR MONITORING</h2>
+              <div class="content-box">
+                <h3 class="highlight-title">${reportData.competitorMonitoring?.growth_headline || 'Market Intelligence Report'}</h3>
+                <p class="text-lg leading-relaxed">${reportData.competitorMonitoring?.opportunity_analysis || 'Analysis in progress...'}</p>
+              </div>
+              
+              <div class="two-column">
+                <div class="column">
+                  <div class="content-box">
+                    <h4 class="text-lg font-bold mb-4">Feature Request Leaderboard</h4>
+                    ${reportData.competitorMonitoring?.feature_request_leaderboard?.map((feature: any) => `
+                      <div class="highlight-box">
+                        <h5 class="highlight-title">${feature.feature_idea}</h5>
+                        <p class="text-sm text-gray-600 mb-2">Request Frequency: ${feature.request_frequency}</p>
+                        <p class="text-sm leading-relaxed">${feature.justification}</p>
+                      </div>
+                    `).join('') || '<p class="text-sm text-gray-600">No feature requests data available</p>'}
+                  </div>
+                </div>
+                
+                <div class="column">
+                  ${reportData.competitorAnalysis && reportData.competitorAnalysis.length > 0 ? `
+                  <div class="content-box">
+                    <h4 class="text-lg font-bold mb-4">Competitor Analysis</h4>
+                    ${reportData.competitorAnalysis.slice(0, 3).map((competitor: any) => `
+                      <div style="border-bottom: 1px solid #e9e4d9; padding-bottom: 15px; margin-bottom: 15px;">
+                        <h5 class="font-bold text-lg mb-2">${competitor.company_name}</h5>
+                        <p class="text-sm text-gray-600 mb-3 leading-relaxed">${competitor.core_product_summary}</p>
+                        <div class="text-xs text-gray-500">
+                          <strong>Main Weakness:</strong> ${competitor.main_weakness}
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+
+            <!-- Growth Opportunities Section -->
+            <div class="section">
+              <h2 class="section-title">📈 GROWTH OPPORTUNITIES</h2>
+              <div class="content-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                  <h3 class="text-2xl font-bold">Growth Score</h3>
+                  <span class="text-3xl font-bold" style="color: #8b5a2b;">${reportData.growthOpportunities?.growth_score || 'N/A'}</span>
+                </div>
+                <p class="text-lg leading-relaxed">${reportData.growthOpportunities?.market_positioning_recommendation || 'Analysis in progress...'}</p>
+              </div>
+
+              <div class="content-box">
+                <h4 class="text-lg font-bold mb-4">Top Opportunities</h4>
+                ${reportData.growthOpportunities?.top_opportunities?.slice(0, 3).map((opportunity: any) => `
+                  <div class="highlight-box">
+                    <h5 class="highlight-title">${opportunity.opportunity_name}</h5>
+                    <div class="text-sm">
+                      <p><strong>Market Demand:</strong> ${opportunity.market_demand}</p>
+                      <p><strong>Competitor Gap:</strong> ${opportunity.competitor_gap}</p>
+                      <p><strong>Implementation Effort:</strong> ${opportunity.implementation_effort}</p>
+                      <p><strong>Revenue Potential:</strong> ${opportunity.revenue_potential}</p>
+                    </div>
+                  </div>
+                `).join('') || '<p class="text-sm text-gray-600">No opportunities data available</p>'}
+              </div>
+            </div>
+
+            <!-- Marketing Engine Section -->
+            <div class="section">
+              <h2 class="section-title">📢 MARKETING ENGINE</h2>
+              <div class="content-box">
+                <h3 class="text-2xl font-bold mb-4">Content Strategy Overview</h3>
+                <p class="text-lg leading-relaxed">${reportData.marketingEngine?.content_strategy_overview || 'Content strategy analysis in progress...'}</p>
+              </div>
+
+              <div class="two-column">
+                <div class="column">
+                  <div class="content-box">
+                    <h4 class="text-lg font-bold mb-4">Content Ideas</h4>
+                    ${reportData.marketingEngine?.content_ideas?.slice(0, 3).map((content: any) => `
+                      <div class="highlight-box">
+                        <h5 class="highlight-title">${content.title}</h5>
+                        <p class="text-sm text-gray-600 mb-2">Format: ${content.format}</p>
+                        <p class="text-sm mb-2 leading-relaxed">${content.angle}</p>
+                        <div class="text-xs text-gray-500">Expected Engagement: ${content.expected_engagement}</div>
+                      </div>
+                    `).join('') || '<p class="text-sm text-gray-600">No content ideas available</p>'}
+                  </div>
+                </div>
+                
+                <div class="column">
+                  <div class="content-box">
+                    <h4 class="text-lg font-bold mb-4">Viral Content Opportunity</h4>
+                    <div style="background: #f0f0f0; padding: 15px; border-radius: 4px; margin-bottom: 15px;">
+                      <p class="text-sm leading-relaxed">${reportData.marketingEngine?.viral_content_opportunity || 'Viral content analysis in progress...'}</p>
+                    </div>
+                    
+                    <h5 class="font-bold mb-2">Trending Hashtags</h5>
+                    <div>
+                      ${reportData.marketingEngine?.trending_hashtags?.map((hashtag: string) => `
+                        <span class="hashtag">${hashtag}</span>
+                      `).join('') || '<span class="text-sm text-gray-600">No hashtags available</span>'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Price Optimization Section -->
+            <div class="section">
+              <h2 class="section-title">💰 PRICE OPTIMIZATION</h2>
+              <div class="content-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                  <h3 class="text-2xl font-bold">Pricing Health Score</h3>
+                  <span class="text-3xl font-bold" style="color: #8b5a2b;">${reportData.priceOptimization?.pricing_health_score || 'N/A'}</span>
+                </div>
+              </div>
+
+              <div class="content-box">
+                <h4 class="text-lg font-bold mb-4">Optimization Recommendations</h4>
+                ${reportData.priceOptimization?.optimization_recommendations?.map((rec: any) => `
+                  <div class="highlight-box">
+                    <h5 class="highlight-title">${rec.recommendation_type}</h5>
+                    <p class="text-sm mb-2 leading-relaxed">${rec.suggested_change}</p>
+                    <div class="text-xs">
+                      <p><strong>Revenue Impact:</strong> ${rec.revenue_impact}</p>
+                      <p><strong>Risk Level:</strong> ${rec.risk_level}</p>
+                      <p><strong>Timeline:</strong> ${rec.implementation_timeline}</p>
+                    </div>
+                  </div>
+                `).join('') || '<p class="text-sm text-gray-600">No recommendations available</p>'}
+              </div>
+            </div>
+
+            <!-- Market Trends Section -->
+            <div class="section">
+              <h2 class="section-title">📊 MARKET TRENDS</h2>
+              <div class="content-box">
+                <h3 class="text-2xl font-bold mb-4" style="color: #8b5a2b;">${reportData.marketTrends?.market_headline || 'Market Intelligence Report'}</h3>
+              </div>
+
+              <div class="two-column">
+                <div class="column">
+                  <div class="content-box">
+                    <h4 class="text-lg font-bold mb-4">Recent Activity Summary</h4>
+                    <p class="text-sm leading-relaxed">${reportData.marketTrends?.recent_activity_summary || 'Activity analysis in progress...'}</p>
+                  </div>
+                  
+                  <div class="content-box">
+                    <h4 class="text-lg font-bold mb-4">Emerging Trends</h4>
+                    <p class="text-sm leading-relaxed">${reportData.marketTrends?.emerging_trends || 'Trend analysis in progress...'}</p>
+                  </div>
+                </div>
+                
+                <div class="column">
+                  <div class="content-box">
+                    <h4 class="text-lg font-bold mb-4">Potential Threats</h4>
+                    <p class="text-sm leading-relaxed">${reportData.marketTrends?.potential_threats || 'Threat analysis in progress...'}</p>
+                  </div>
+                  
+                  <div class="content-box">
+                    <h4 class="text-lg font-bold mb-4">Partnership Opportunity</h4>
+                    <p class="text-sm leading-relaxed">${reportData.marketTrends?.partnership_opportunity || 'Partnership analysis in progress...'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Target Personas Section -->
+            <div class="section">
+              <h2 class="section-title">👥 TARGET PERSONAS</h2>
+              ${reportData.targetPersonas?.map((persona: any) => `
+                <div class="content-box">
+                  <h3 class="text-2xl font-bold mb-4" style="color: #8b5a2b;">${persona.persona_name}</h3>
+                  <p class="text-lg mb-4">${persona.job_title}</p>
+                  <p class="text-sm text-gray-600 mb-6 leading-relaxed">${persona.demographics}</p>
+                  
+                  <div class="two-column">
+                    <div class="column">
+                      <h4 class="font-bold mb-3 text-lg">Core Pain Points</h4>
+                      <ul class="text-sm">
+                        ${persona.core_pain_points?.map((pain: string) => `
+                          <li style="display: flex; align-items: flex-start; margin-bottom: 8px;">
+                            <span style="color: #8b5a2b; margin-right: 8px;">•</span>
+                            <span class="leading-relaxed">${pain}</span>
+                          </li>
+                        `).join('')}
+                      </ul>
+                    </div>
+                    
+                    <div class="column">
+                      <h4 class="font-bold mb-3 text-lg">Watering Holes</h4>
+                      <p class="text-sm leading-relaxed">${persona.watering_holes || 'Analysis pending...'}</p>
+                    </div>
+                  </div>
+                </div>
+              `).join('') || '<div class="content-box"><p class="text-sm text-gray-600">Persona analysis in progress...</p></div>'}
+            </div>
+          </div>
+
+          <!-- Newsletter Footer -->
+          <div class="footer">
+            <p><strong>The BizAtlas Chronicle</strong> - Competitive Intelligence Newsletter</p>
+            <p>Generated on ${currentDate} • ${reportData.summary?.totalCompetitors || 0} Competitors Analyzed</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return html;
+  };
+  console.log((generateReportHTML()));
+
   if (error) {
     return (
       <ProtectedRoute>

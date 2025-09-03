@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL || 'http://localhost:3000';
+const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL || 'http://localhost:4000';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,6 +15,7 @@ export async function POST(request: NextRequest) {
     });
 
     const data = await response.json();
+    console.log(data);
     
     return NextResponse.json(data, { status: response.status });
   } catch (error) {
