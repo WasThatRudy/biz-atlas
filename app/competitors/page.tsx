@@ -87,11 +87,11 @@ export default function Competitors() {
       }
 
       // Proceed to analysis
-      router.push('/report/tech-startup-2025-01');
+      router.push('/dashboard');
     } catch (error) {
       console.error('Error updating competitors:', error);
       // Still proceed to analysis even if step-2 fails
-      router.push('/report/tech-startup-2025-01');
+      router.push('/dashboard');
     }
   };
 

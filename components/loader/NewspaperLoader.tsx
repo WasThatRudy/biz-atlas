@@ -338,9 +338,10 @@ const AllPuzzlesSolved: FC = () => (
 interface LoaderProps {
   isLoading: boolean;
   loadingText?: string;
+  progress?: number;
 }
 
-export function InteractiveNewspaperLoader({ isLoading, loadingText = "Compiling Your Report..." }: LoaderProps) {
+export function InteractiveNewspaperLoader({ isLoading, loadingText = "Compiling Your Report...", progress }: LoaderProps) {
   const [selectedPuzzle, setSelectedPuzzle] = useState<ReactNode | null>(null);
   const [solvedPuzzleKeys, setSolvedPuzzleKeys] = useState<PuzzleKey[]>([]);
 
@@ -416,6 +417,24 @@ export function InteractiveNewspaperLoader({ isLoading, loadingText = "Compiling
                     transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
                 />
             </div>
+
+            {/* Progress Bar */}
+            {progress !== undefined && (
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-[#888]">Analysis Progress</span>
+                  <span className="text-sm text-[#888]">{progress}%</span>
+                </div>
+                <div className="w-full bg-[#e9e4d9] rounded-full h-2">
+                  <motion.div
+                    className="bg-[#1a1a1a] h-2 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="min-h-[350px] flex items-center justify-center">
                 <AnimatePresence mode="wait">
