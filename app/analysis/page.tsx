@@ -19,6 +19,7 @@ export default function Analysis() {
 
     let currentPhase = 0;
     let startTime = Date.now();
+    let hasRedirected = false;
 
     const updateProgress = () => {
       const elapsed = Date.now() - startTime;
@@ -45,7 +46,8 @@ export default function Analysis() {
         setStatusText(phases[currentPhase].text);
       }
 
-      if (newProgress >= 100) {
+      if (newProgress >= 100 && !hasRedirected) {
+        hasRedirected = true;
         setTimeout(() => {
           router.push('/report/newly-generated-report-123');
         }, 500);

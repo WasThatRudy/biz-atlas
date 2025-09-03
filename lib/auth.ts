@@ -155,9 +155,9 @@ class AuthService {
   }
 
   // Get authorization header for API calls
-  getAuthHeader(): { Authorization: string } | {} {
+  getAuthHeader(): { authorization: string } | {} {
     if (this.token) {
-      return { Authorization: `Bearer ${this.token}` };
+      return { authorization: `Bearer ${this.token}` };
     }
     return {};
   }

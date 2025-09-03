@@ -11,6 +11,7 @@ interface AuthContextType {
   signup: (email: string, password: string, name?: string) => Promise<boolean>;
   logout: () => void;
   checkAuth: () => void;
+  getAuthHeader: () => { authorization: string } | {};
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,15 +19,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const checkAuth = () => {
     setIsLoading(true);
     
     // Check if token is valid
     if (authService.checkTokenValidity()) {
-      setUser(authService.getUser());
+      const currentUser = authService.getUser();
+      setUser(currentUser);
+      setIsAuthenticated(!!currentUser);
     } else {
       setUser(null);
+      setIsAuthenticated(false);
     }
     
     setIsLoading(false);
@@ -40,7 +45,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const result = await authService.login({ email, password });
       if (result.success) {
-        setUser(authService.getUser());
+        const currentUser = authService.getUser();
+        setUser(currentUser);
+        setIsAuthenticated(!!currentUser);
         return true;
       }
       return false;
@@ -54,7 +61,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const result = await authService.signup({ email, password, name });
       if (result.success) {
-        setUser(authService.getUser());
+        const currentUser = authService.getUser();
+        setUser(currentUser);
+        setIsAuthenticated(!!currentUser);
         return true;
       }
       return false;
@@ -67,16 +76,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     authService.logout();
     setUser(null);
+    setIsAuthenticated(false);
+  };
+
+  const getAuthHeader = () => {
+    return authService.getAuthHeader();
   };
 
   const value: AuthContextType = {
     user,
-    isAuthenticated: !!user && authService.isAuthenticated(),
+    isAuthenticated,
     isLoading,
     login,
     signup,
     logout,
     checkAuth,
+    getAuthHeader,
   };
 
   return (
