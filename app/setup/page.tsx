@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Navigation } from '@/components/navigation';
+import Link from 'next/link';
 
 export default function Setup() {
   const [input, setInput] = useState('');
