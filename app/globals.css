@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lora:wght@400;500;600&display=swap');
+
+:root {
+  --font-playfair: 'Playfair Display', serif;
+  --font-lora: 'Lora', serif;
+}
+
+@layer base {
+  :root {
+    --background: 248 245 240;
+    --foreground: 26 26 26;
+    --card: 248 245 240;
+    --card-foreground: 26 26 26;
+    --popover: 248 245 240;
+    --popover-foreground: 26 26 26;
+    --primary: 26 26 26;
+    --primary-foreground: 248 245 240;
+    --secondary: 220 218 214;
+    --secondary-foreground: 26 26 26;
+    --muted: 220 218 214;
+    --muted-foreground: 115 115 115;
+    --accent: 139 69 19;
+    --accent-foreground: 248 245 240;
+    --destructive: 185 28 28;
+    --destructive-foreground: 248 245 240;
+    --border: 26 26 26;
+    --input: 220 218 214;
+    --ring: 26 26 26;
+    --radius: 0;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-lora;
+    line-height: 1.6;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-playfair;
+    line-height: 1.2;
+  }
+}
+
+@layer components {
+  .newspaper-border {
+    @apply border border-[#1a1a1a] bg-[#f8f5f0];
+  }
+  
+  .newspaper-divider {
+    @apply border-t border-[#1a1a1a] my-6;
+  }
+  
+  .letterpress-btn {
+    @apply bg-[#1a1a1a] text-[#f8f5f0] px-6 py-3 border border-[#1a1a1a] transition-all duration-150;
+  }
+  
+  .letterpress-btn:hover {
+    @apply translate-x-0.5 translate-y-0.5 shadow-none;
+  }
+  
+  .newspaper-column {
+    @apply border-r border-[#1a1a1a] pr-6 mr-6 last:border-r-0 last:pr-0 last:mr-0;
+  }
+}
