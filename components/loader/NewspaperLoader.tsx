@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence, Reorder, Variants } from 'framer-motion';
-import { useEffect, useState, useMemo, ReactNode, FC, ChangeEvent, KeyboardEvent, useRef } from 'react';
+import { useEffect, useState, useMemo, ReactNode, FC, ChangeEvent, KeyboardEvent, useRef, memo, useCallback } from 'react';
 
 // --- Type Definitions ---
 
@@ -89,10 +89,10 @@ const puzzleVariants: Variants = {
 };
 
 interface PuzzleProps {
-    onSolve: () => void;
+    onSolve: (key: PuzzleKey) => void;
 }
 
-const InteractiveSudoku: FC<PuzzleProps> = ({ onSolve }) => {
+const InteractiveSudoku: FC<Omit<PuzzleProps, 'onSolve'> & { onSolve: (key: 'sudoku') => void }> = memo(({ onSolve }) => {
     const [board, setBoard] = useState<SudokuBoard>(sudokuData.puzzle);
     const [status, setStatus] = useState<SudokuStatus>('playing');
     const [isSolved, setIsSolved] = useState(false);
@@ -113,7 +113,7 @@ const InteractiveSudoku: FC<PuzzleProps> = ({ onSolve }) => {
         setStatus(isCorrect ? 'correct' : 'incorrect');
         if(isCorrect) {
             setIsSolved(true);
-            setTimeout(onSolve, 600);
+            setTimeout(() => onSolve('sudoku'), 600);
         }
     };
 
@@ -146,9 +146,11 @@ const InteractiveSudoku: FC<PuzzleProps> = ({ onSolve }) => {
             </AnimatePresence>
         </motion.div>
     );
-}
+});
+InteractiveSudoku.displayName = 'InteractiveSudoku';
 
-const InteractiveWordJumble: FC<{ jumble: WordJumble } & PuzzleProps> = ({ jumble, onSolve }) => {
+
+const InteractiveWordJumble: FC<{ jumble: WordJumble } & Omit<PuzzleProps, 'onSolve'> & { onSolve: (key: 'jumble') => void }> = memo(({ jumble, onSolve }) => {
     const initialItems = useMemo(() => jumble.jumbled.split('').map((char: string, i: number) => ({ id: i, char })), [jumble]);
     const [items, setItems] = useState<JumbleItem[]>(initialItems);
     const [isSolved, setIsSolved] = useState(false);
@@ -162,7 +164,7 @@ const InteractiveWordJumble: FC<{ jumble: WordJumble } & PuzzleProps> = ({ jumbl
 
         if (solved && !hasTriggeredSolve) {
             setHasTriggeredSolve(true);
-            setTimeout(onSolve, 600);
+            setTimeout(() => onSolve('jumble'), 600);
         }
     }, [items, jumble.solved, onSolve, hasTriggeredSolve]);
 
@@ -192,9 +194,11 @@ const InteractiveWordJumble: FC<{ jumble: WordJumble } & PuzzleProps> = ({ jumbl
             </AnimatePresence>
         </motion.div>
     )
-}
+});
+InteractiveWordJumble.displayName = 'InteractiveWordJumble';
 
-const InteractiveCrossword: FC<PuzzleProps> = ({ onSolve }) => {
+
+const InteractiveCrossword: FC<Omit<PuzzleProps, 'onSolve'> & { onSolve: (key: 'crossword') => void }> = memo(({ onSolve }) => {
     const prefilledLetters: CrosswordInputs = {'2-2':'A'}; // Pre-fill intersection
     const [inputs, setInputs] = useState<CrosswordInputs>(prefilledLetters);
     const [isSolved, setIsSolved] = useState(false);
@@ -268,7 +272,7 @@ const InteractiveCrossword: FC<PuzzleProps> = ({ onSolve }) => {
 
         if (allCorrect) {
             setIsSolved(true);
-            setTimeout(onSolve, 600);
+            setTimeout(() => onSolve('crossword'), 600);
         }
     }, [inputs, onSolve, isSolved]);
 
@@ -288,7 +292,11 @@ const InteractiveCrossword: FC<PuzzleProps> = ({ onSolve }) => {
                              return (
                                 <div key={key} className="w-10 h-10 relative" onClick={() => setSelectedCell({row: r, col: c})}>
                                    <input
-                                        ref={el => inputRefs.current[r][c] = el}
+                                        ref={el => {
+                                            if (inputRefs.current[r]) {
+                                                inputRefs.current[r][c] = el;
+                                            }
+                                        }}
                                         type="text"
                                         maxLength={1}
                                         value={inputs[key] || ''}
@@ -313,7 +321,9 @@ const InteractiveCrossword: FC<PuzzleProps> = ({ onSolve }) => {
             </div>
         </motion.div>
     )
-}
+});
+InteractiveCrossword.displayName = 'InteractiveCrossword';
+
 
 const AllPuzzlesSolved: FC = () => (
     <motion.div variants={puzzleVariants} initial="hidden" animate="visible" exit="exit" className="text-center">
@@ -334,42 +344,36 @@ export function InteractiveNewspaperLoader({ isLoading, loadingText = "Compiling
   const [selectedPuzzle, setSelectedPuzzle] = useState<ReactNode | null>(null);
   const [solvedPuzzleKeys, setSolvedPuzzleKeys] = useState<PuzzleKey[]>([]);
 
-  const puzzleFactory = useMemo(() => ({
-    crossword: <InteractiveCrossword key="crossword" onSolve={() => handlePuzzleSolved('crossword')} />,
-    sudoku: <InteractiveSudoku key="sudoku" onSolve={() => handlePuzzleSolved('sudoku')} />,
-    jumble: <InteractiveWordJumble key="jumble" jumble={wordJumbles[Math.floor(Math.random() * wordJumbles.length)]} onSolve={() => handlePuzzleSolved('jumble')} />
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), []);
+  const handlePuzzleSolved = useCallback((key: PuzzleKey) => {
+    setSolvedPuzzleKeys(prev => prev.includes(key) ? prev : [...prev, key]);
+  }, []);
 
-  const selectNewPuzzle = (currentSolvedKeys: PuzzleKey[] = []) => {
+  const puzzleFactory = useMemo(() => ({
+    crossword: <InteractiveCrossword key="crossword" onSolve={handlePuzzleSolved} />,
+    sudoku: <InteractiveSudoku key="sudoku" onSolve={handlePuzzleSolved} />,
+    jumble: <InteractiveWordJumble key="jumble" jumble={wordJumbles[Math.floor(Math.random() * wordJumbles.length)]} onSolve={handlePuzzleSolved} />
+  }), [handlePuzzleSolved]);
+
+  useEffect(() => {
+    if (isLoading) {
       const allPuzzleKeys = Object.keys(puzzleFactory) as PuzzleKey[];
-      const availablePuzzleKeys = allPuzzleKeys.filter(k => !currentSolvedKeys.includes(k));
+      const availablePuzzleKeys = allPuzzleKeys.filter(k => !solvedPuzzleKeys.includes(k));
 
       if (availablePuzzleKeys.length > 0) {
-          const randomKey = availablePuzzleKeys[Math.floor(Math.random() * availablePuzzleKeys.length)];
-          setSelectedPuzzle(puzzleFactory[randomKey]);
+        const randomKey = availablePuzzleKeys[Math.floor(Math.random() * availablePuzzleKeys.length)];
+        setSelectedPuzzle(puzzleFactory[randomKey]);
       } else {
-          setSelectedPuzzle(<AllPuzzlesSolved />);
+        setSelectedPuzzle(<AllPuzzlesSolved />);
       }
-  };
-
-  const handlePuzzleSolved = (key: PuzzleKey) => {
-    setSolvedPuzzleKeys(prevSolvedKeys => {
-        const newSolvedKeys = prevSolvedKeys.includes(key)
-          ? prevSolvedKeys
-          : [...prevSolvedKeys, key];
-        selectNewPuzzle(newSolvedKeys);
-        return newSolvedKeys;
-    });
-  };
+    }
+  }, [isLoading, solvedPuzzleKeys, puzzleFactory]);
 
   useEffect(() => {
     if (isLoading) {
       setSolvedPuzzleKeys([]);
-      selectNewPuzzle([]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading]);
+
 
   return (
     <AnimatePresence>
@@ -389,7 +393,7 @@ export function InteractiveNewspaperLoader({ isLoading, loadingText = "Compiling
             <div className="absolute top-0 left-0 right-0 h-2 bg-repeat-x bg-[length:40px_8px]" style={{backgroundImage: 'linear-gradient(to right, #1a1a1a 50%, transparent 50%)'}}/>
             
             <h2 className="font-playfair text-center text-4xl font-bold mb-3 text-[#1a1a1a]">
-              Loading
+              Have Some Fun While...
             </h2>
             <p className="text-center text-base text-[#666] mb-4">{loadingText}</p>
             
