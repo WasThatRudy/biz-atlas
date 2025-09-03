@@ -42,41 +42,73 @@ export default function Home() {
           <p className="text-sm tracking-wider text-[#666] mb-4">
             EST. 2025 • VOL. 1 • COMPETITIVE INTELLIGENCE WEEKLY
           </p>
-          <div className="newspaper-divider"></div>
         </motion.header>
 
-        {/* Hero Section - Front Page Headline */}
-        <motion.section variants={itemVariants} className="text-center mb-16">
-          <h2 className="text-5xl font-playfair font-bold mb-6 leading-tight">
-            EXTRA! Chart Your Competitive<br />Landscape with Unprecedented Clarity
-          </h2>
-          <p className="text-xl font-lora mb-8 text-[#444] max-w-2xl mx-auto">
-            Exclusive analysis reveals market secrets. Your business, our atlas.
-          </p>
-          
-          <div className="flex justify-center mb-8">
-            <CompassIcon className="w-32 h-32" />
+        {/* Hero Section - Newspaper Classified Ads Style */}
+        <motion.section variants={itemVariants} className="mb-16 relative">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto relative">
+            {/* Startup Analysis - Classified Ad Style */}
+            <div className="relative">
+              <Link href="/setup?path=startup">
+                <motion.div 
+                  className="newspaper-border p-8 h-64 bg-[#f8f5f0] hover:bg-[#f0ede8] transition-colors cursor-pointer relative z-10"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="text-center border-b-2 border-[#1a1a1a] pb-4 mb-4">
+                    <h3 className="text-sm font-lora tracking-widest text-[#666] uppercase">
+                      New Business Ventures
+                    </h3>
+                  </div>
+                  
+                  <div className="text-center">
+                    <h2 className="text-3xl font-playfair font-black mb-4 leading-tight">
+                      LAUNCH A NEW<br />VENTURE
+                    </h2>
+                    <p className="font-lora text-sm text-[#666] leading-relaxed">
+                      Professional market analysis for startup ideas. Get competitive intelligence before you launch.
+                    </p>
+                  </div>
+                </motion.div>
+              </Link>
+              
+
+            </div>
+
+            {/* Business Analysis - Classified Ad Style */}
+            <div className="relative">
+              <Link href="/setup?path=business">
+                <motion.div 
+                  className="newspaper-border p-8 h-64 bg-[#f8f5f0] hover:bg-[#f0ede8] transition-colors cursor-pointer relative z-10"
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div className="text-center border-b-2 border-[#1a1a1a] pb-4 mb-4">
+                    <h3 className="text-sm font-lora tracking-widest text-[#666] uppercase">
+                      Established Companies
+                    </h3>
+                  </div>
+                  
+                  <div className="text-center">
+                    <h2 className="text-3xl font-playfair font-black mb-4 leading-tight">
+                      ANALYZE EXISTING<br />BUSINESS
+                    </h2>
+                    <p className="font-lora text-sm text-[#666] leading-relaxed">
+                      Comprehensive competitive analysis for established businesses seeking market insights.
+                    </p>
+                  </div>
+                </motion.div>
+              </Link>
+              
+
+            </div>
           </div>
           
-          <div className="flex gap-6 justify-center">
-            <Link href="/setup?path=startup">
-              <motion.button 
-                className="letterpress-btn text-lg font-lora"
-                whileHover={{ x: 2, y: 2 }}
-                transition={{ duration: 0.1 }}
-              >
-                Launch a New Venture
-              </motion.button>
-            </Link>
-            <Link href="/setup?path=business">
-              <motion.button 
-                className="letterpress-btn text-lg font-lora"
-                whileHover={{ x: 2, y: 2 }}
-                transition={{ duration: 0.1 }}
-              >
-                Analyze an Existing Business
-              </motion.button>
-            </Link>
+          {/* Central encouraging text */}
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+            <div className="bg-[#f8f5f0] px-4 py-2 border border-dashed border-[#8b5a2b] transform rotate-3 shadow-sm">
+              <span className="font-lora text-sm text-[#8b5a2b] font-medium">← Click to start →</span>
+            </div>
           </div>
         </motion.section>
 
@@ -95,8 +127,7 @@ export default function Home() {
                 <h4 className="text-xl font-playfair font-bold">Deep Market Insights</h4>
               </div>
               <p className="font-lora leading-relaxed">
-                Our correspondents delve deep into market territories, uncovering the strategic positions 
-                of your competitors with the thoroughness of investigative journalism.
+                Uncover strategic competitor positions with thoroughness of investigative journalism.
               </p>
             </article>
             
@@ -106,8 +137,7 @@ export default function Home() {
                 <h4 className="text-xl font-playfair font-bold">Strategy Deconstructed</h4>
               </div>
               <p className="font-lora leading-relaxed">
-                We break down complex competitive landscapes into clear, actionable intelligence, 
-                delivered with the clarity and precision you expect from seasoned analysts.
+                Transform complex competitive landscapes into clear, actionable intelligence.
               </p>
             </article>
             
@@ -117,8 +147,7 @@ export default function Home() {
                 <h4 className="text-xl font-playfair font-bold">Market Cartography</h4>
               </div>
               <p className="font-lora leading-relaxed">
-                Navigate your competitive terrain with our expertly crafted market maps, 
-                charting the opportunities and threats that define your business landscape.
+                Navigate competitive terrain with expertly crafted market maps.
               </p>
             </article>
           </div>
@@ -173,8 +202,7 @@ export default function Home() {
             <div className="newspaper-column">
               <h5 className="font-playfair font-bold mb-4">Subscription</h5>
               <p className="font-lora text-sm leading-relaxed">
-                Stay informed with the latest competitive intelligence and market analysis 
-                from The BizAtlas Chronicle editorial team.
+                Stay informed with competitive intelligence from The BizAtlas Chronicle.
               </p>
             </div>
           </div>

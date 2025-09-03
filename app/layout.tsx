@@ -15,7 +15,7 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: 'The BizAtlas Chronicle - Competitive Intelligence',
+  title: 'The BizAtlas Chronicle',
   description: 'Chart your competitive landscape with unprecedented clarity',
 };
 
