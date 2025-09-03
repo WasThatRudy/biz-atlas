@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { AuthForm } from '@/components/auth/auth-form';
 import { authService } from '@/lib/auth';
 
-export default function AuthPage() {
+function AuthPageContent() {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -129,5 +129,20 @@ export default function AuthPage() {
         </motion.div>
       </motion.div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#f8f5f0] flex items-center justify-center p-4">
+        <div className="w-full max-w-md text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1a1a1a] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <AuthPageContent />
+    </Suspense>
   );
 }
