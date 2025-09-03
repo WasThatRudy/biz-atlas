@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Playfair_Display, Lora } from 'next/font/google';
+import { AuthProvider } from '@/lib/auth-context';
 
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
@@ -27,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfair.variable} ${lora.variable} font-lora bg-[#f8f5f0] text-[#1a1a1a]`}>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

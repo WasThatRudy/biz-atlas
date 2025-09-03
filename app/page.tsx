@@ -1,14 +1,22 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Navigation } from '@/components/navigation';
 import { CompassIcon } from '@/components/icons/compass';
 import { MapIcon } from '@/components/icons/map';
 import { QuillIcon } from '@/components/icons/quill';
 import { TelescopeIcon } from '@/components/icons/telescope';
+import { useAuth } from '@/lib/auth-context';
 
 export default function Home() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+
+  // Note: Removed automatic redirect to dashboard for logged-in users
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {

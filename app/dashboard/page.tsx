@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Navigation } from '@/components/navigation';
 import { mockReports } from '@/lib/mock-data';
+import { ProtectedRoute } from '@/components/auth/protected-route';
 
 export default function Dashboard() {
   const containerVariants = {
@@ -22,10 +23,11 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f5f0]">
-      <Navigation />
-      
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-[#f8f5f0]">
+        <Navigation />
+        
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -128,5 +130,6 @@ export default function Dashboard() {
         </motion.div>
       </main>
     </div>
+    </ProtectedRoute>
   );
 }

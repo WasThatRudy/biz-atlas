@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Navigation } from '@/components/navigation';
+import { ProtectedRoute } from '@/components/auth/protected-route';
 
 interface ReportViewProps {
   reportId: string;
@@ -17,7 +18,8 @@ export function ReportView({ reportId }: ReportViewProps) {
   });
 
   return (
-    <div className="min-h-screen bg-[#f8f5f0]">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-[#f8f5f0]">
       <Navigation />
       
       <main className="container mx-auto px-4 py-8">
@@ -152,5 +154,6 @@ export function ReportView({ reportId }: ReportViewProps) {
         </motion.div>
       </main>
     </div>
+    </ProtectedRoute>
   );
 }

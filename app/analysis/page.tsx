@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ProtectedRoute } from '@/components/auth/protected-route';
 
 export default function Analysis() {
   const [progress, setProgress] = useState(0);
@@ -56,7 +57,8 @@ export default function Analysis() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-[#f8f5f0] flex items-center justify-center">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-[#f8f5f0] flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -181,5 +183,6 @@ export default function Analysis() {
         </div>
       </motion.div>
     </div>
+    </ProtectedRoute>
   );
 }

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Navigation } from '@/components/navigation';
+import { ProtectedRoute } from '@/components/auth/protected-route';
 import Link from 'next/link';
 
 function SetupContent() {
@@ -119,24 +120,26 @@ function SetupContent() {
 
 export default function Setup() {
   return (
-    <div className="min-h-screen bg-[#f8f5f0]">
-      <Navigation />
-      <Suspense fallback={
-        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-          <div className="max-w-2xl mx-auto">
-            <div className="newspaper-border p-6 sm:p-8 lg:p-12">
-              <div className="text-center">
-                <div className="animate-pulse">
-                  <div className="h-6 sm:h-8 bg-gray-300 rounded mb-3 sm:mb-4"></div>
-                  <div className="h-3 sm:h-4 bg-gray-200 rounded mb-6 sm:mb-8"></div>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-[#f8f5f0]">
+        <Navigation />
+        <Suspense fallback={
+          <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+            <div className="max-w-2xl mx-auto">
+              <div className="newspaper-border p-6 sm:p-8 lg:p-12">
+                <div className="text-center">
+                  <div className="animate-pulse">
+                    <div className="h-6 sm:h-8 bg-gray-300 rounded mb-3 sm:mb-4"></div>
+                    <div className="h-3 sm:h-4 bg-gray-200 rounded mb-6 sm:mb-8"></div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </main>
-      }>
-        <SetupContent />
-      </Suspense>
-    </div>
+          </main>
+        }>
+          <SetupContent />
+        </Suspense>
+      </div>
+    </ProtectedRoute>
   );
 }

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navigation } from '@/components/navigation';
+import { ProtectedRoute } from '@/components/auth/protected-route';
 
 const mockCompetitors = [
   { id: 1, name: 'TechCorp Solutions', description: 'Enterprise software and cloud services' },
@@ -39,7 +40,8 @@ export default function Competitors() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f5f0]">
+    <ProtectedRoute>
+      <div className="min-h-screen bg-[#f8f5f0]">
       <Navigation />
       
       <main className="container mx-auto px-4 py-8">
@@ -144,5 +146,6 @@ export default function Competitors() {
         </motion.div>
       </main>
     </div>
+    </ProtectedRoute>
   );
 }

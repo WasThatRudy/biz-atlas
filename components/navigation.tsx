@@ -3,26 +3,15 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/lib/auth-context';
+import { User, LogOut, Menu, X } from 'lucide-react';
 
 export function Navigation() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const handleAuth = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Dummy authentication - just toggle login state
-    setIsLoggedIn(true);
-    setShowAuthModal(false);
-  };
-
   const handleLogout = () => {
-    setIsLoggedIn(false);
-  };
-
-  const closeModal = () => {
-    setShowAuthModal(false);
+    logout();
   };
 
   const toggleMobileMenu = () => {
@@ -37,9 +26,6 @@ export function Navigation() {
   useEffect(() => {
     const handleEscKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (showAuthModal) {
-          closeModal();
-        }
         if (isMobileMenuOpen) {
           closeMobileMenu();
         }
@@ -62,7 +48,7 @@ export function Navigation() {
       document.removeEventListener('keydown', handleEscKey);
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [showAuthModal, isMobileMenuOpen]);
+  }, [isMobileMenuOpen]);
 
   return (
     <>
@@ -83,36 +69,40 @@ export function Navigation() {
                 Dashboard
               </Link>
               
-              {isLoggedIn ? (
-                <>
-                  <span className="font-lora text-sm text-[#666] hidden lg:inline">Welcome back!</span>
+              {isAuthenticated ? (
+                <div className="flex items-center gap-4 group">
+                  <div className="flex items-center gap-2 cursor-pointer">
+                    <User className="h-4 w-4" />
+                    <span className="font-lora text-sm text-[#666] hidden lg:inline">
+                      Welcome, {user?.name || user?.email}!
+                    </span>
+                  </div>
                   <button 
                     onClick={handleLogout}
-                    className="font-lora hover:text-[#8b5a2b] transition-colors"
+                    className="font-lora hover:text-[#8b5a2b] transition-all duration-200 flex items-center gap-2 opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0"
                   >
+                    <LogOut className="h-4 w-4" />
                     Logout
                   </button>
-                </>
+                </div>
               ) : (
                 <>
-                  <button 
-                    onClick={() => { setIsSignUp(false); setShowAuthModal(true); }}
+                  <Link 
+                    href="/auth?mode=login"
                     className="font-lora hover:text-[#8b5a2b] transition-colors"
                   >
                     Login
-                  </button>
-                  <button 
-                    onClick={() => { setIsSignUp(true); setShowAuthModal(true); }}
+                  </Link>
+                  <Link 
+                    href="/auth?mode=signup"
                     className="font-lora px-4 py-2 border border-[#1a1a1a] hover:bg-[#8b5a2b] hover:text-white transition-colors"
                   >
                     Sign Up
-                  </button>
+                  </Link>
                 </>
               )}
               
-              <Link href="/setup?path=startup" className="letterpress-btn hover:translate-x-0.5 hover:translate-y-0.5 transition-transform px-4 py-2">
-                Start New Report
-              </Link>
+
             </div>
 
             {/* Mobile Menu Button */}
@@ -147,133 +137,49 @@ export function Navigation() {
                   Dashboard
                 </Link>
                 
-                {isLoggedIn ? (
-                  <button 
-                    onClick={() => { handleLogout(); closeMobileMenu(); }}
-                    className="font-lora hover:text-[#8b5a2b] transition-colors py-2 text-left"
-                  >
-                    Logout
-                  </button>
+                {isAuthenticated ? (
+                  <>
+                    <div className="flex items-center gap-2 py-2">
+                      <User className="h-4 w-4" />
+                      <span className="font-lora text-sm text-[#666]">
+                        {user?.name || user?.email}
+                      </span>
+                    </div>
+                    <button 
+                      onClick={() => { handleLogout(); closeMobileMenu(); }}
+                      className="font-lora hover:text-[#8b5a2b] transition-colors py-2 text-left flex items-center gap-2"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Logout
+                    </button>
+                  </>
                 ) : (
                   <>
-                    <button 
-                      onClick={() => { setIsSignUp(false); setShowAuthModal(true); closeMobileMenu(); }}
-                      className="font-lora hover:text-[#8b5a2b] transition-colors py-2 text-left"
+                    <Link 
+                      href="/auth?mode=login"
+                      className="font-lora hover:text-[#8b5a2b] transition-colors py-2"
+                      onClick={closeMobileMenu}
                     >
                       Login
-                    </button>
-                    <button 
-                      onClick={() => { setIsSignUp(true); setShowAuthModal(true); closeMobileMenu(); }}
+                    </Link>
+                    <Link 
+                      href="/auth?mode=signup"
                       className="font-lora px-4 py-2 border border-[#1a1a1a] hover:bg-[#8b5a2b] hover:text-white transition-colors text-center"
+                      onClick={closeMobileMenu}
                     >
                       Sign Up
-                    </button>
+                    </Link>
                   </>
                 )}
                 
-                <Link 
-                  href="/setup?path=startup" 
-                  className="letterpress-btn text-center py-3"
-                  onClick={closeMobileMenu}
-                >
-                  Start New Report
-                </Link>
+
               </div>
             </motion.div>
           )}
         </div>
       </motion.nav>
 
-      {/* Auth Modal */}
-      {showAuthModal && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          onClick={closeModal}
-        >
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-[#f8f5f0] newspaper-border p-6 sm:p-8 max-w-md w-full mx-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-xl sm:text-2xl font-playfair font-bold text-center mb-4 sm:mb-6">
-              {isSignUp ? 'Join The Chronicle' : 'Welcome Back'}
-            </h2>
-            
-            <form onSubmit={handleAuth} className="space-y-3 sm:space-y-4">
-              <div>
-                <label className="block font-lora font-medium mb-2 text-sm sm:text-base">Email</label>
-                <input 
-                  type="email" 
-                  required
-                  className="w-full p-2.5 sm:p-3 border border-[#1a1a1a] bg-[#f8f5f0] font-lora focus:outline-none focus:ring-1 focus:ring-[#8b5a2b] text-sm sm:text-base"
-                  placeholder="your@email.com"
-                />
-              </div>
-              
-              <div>
-                <label className="block font-lora font-medium mb-2 text-sm sm:text-base">Password</label>
-                <input 
-                  type="password" 
-                  required
-                  className="w-full p-2.5 sm:p-3 border border-[#1a1a1a] bg-[#f8f5f0] font-lora focus:outline-none focus:ring-1 focus:ring-[#8b5a2b] text-sm sm:text-base"
-                  placeholder="Your password"
-                />
-              </div>
-              
-              {isSignUp && (
-                <div>
-                  <label className="block font-lora font-medium mb-2 text-sm sm:text-base">Confirm Password</label>
-                  <input 
-                    type="password" 
-                    required
-                    className="w-full p-2.5 sm:p-3 border border-[#1a1a1a] bg-[#f8f5f0] font-lora focus:outline-none focus:ring-1 focus:ring-[#8b5a2b] text-sm sm:text-base"
-                    placeholder="Confirm your password"
-                  />
-                </div>
-              )}
-              
-              <div className="flex gap-2 sm:gap-3 pt-3 sm:pt-4">
-                <button 
-                  type="submit"
-                  className="letterpress-btn flex-1 text-sm sm:text-base py-2 sm:py-3"
-                >
-                  {isSignUp ? 'Create Account' : 'Sign In'}
-                </button>
-                <button 
-                  type="button"
-                  onClick={closeModal}
-                  className="px-3 sm:px-4 py-2 border border-[#1a1a1a] font-lora hover:bg-gray-100 transition-colors text-sm sm:text-base"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-            
-            <div className="text-center mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-[#1a1a1a]">
-              <p className="font-lora text-xs sm:text-sm text-[#666] mb-2 sm:mb-3">
-                {isSignUp ? 'Already have an account?' : "Don't have an account?"}
-              </p>
-              <button 
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="font-lora text-[#8b5a2b] hover:underline text-sm sm:text-base"
-              >
-                {isSignUp ? 'Sign In' : 'Sign Up'}
-              </button>
-            </div>
-            
-            <div className="text-center mt-3 sm:mt-4">
-              <p className="font-lora text-xs text-[#666] mb-2">Or continue with:</p>
-              <button 
-                onClick={handleAuth}
-                className="w-full p-2.5 sm:p-3 border border-[#1a1a1a] font-lora hover:bg-gray-100 transition-colors text-sm sm:text-base"
-              >
-                Continue with Google
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+
     </>
   );
 }
