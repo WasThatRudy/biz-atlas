@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { useAuth } from '@/lib/auth-context';
@@ -29,7 +29,11 @@ export default function Competitors() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { getAuthHeader } = useAuth();
+  
+  const path = searchParams.get('path');
+  const isStartup = path === 'startup';
 
   useEffect(() => {
     // Load competitors data from localStorage
@@ -86,12 +90,22 @@ export default function Competitors() {
         }
       }
 
-      // Proceed to analysis
-      router.push('/dashboard');
+      // Proceed to analysis based on path
+      if (isStartup) {
+        // New Business Venture - use launchpad analysis
+        router.push('/dashboard-b');
+      } else {
+        // Existing Business - use competitive intelligence
+        router.push('/dashboard');
+      }
     } catch (error) {
       console.error('Error updating competitors:', error);
       // Still proceed to analysis even if step-2 fails
-      router.push('/dashboard');
+      if (isStartup) {
+        router.push('/dashboard-b');
+      } else {
+        router.push('/dashboard');
+      }
     }
   };
 

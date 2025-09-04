@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Navigation } from '@/components/navigation';
@@ -15,7 +15,18 @@ export default function Home() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
-  // Note: Removed automatic redirect to dashboard for logged-in users
+
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#f8f5f0] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1a1a1a] mx-auto mb-4"></div>
+          <p className="font-lora text-sm text-[#666]">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -229,4 +240,8 @@ export default function Home() {
       </motion.main>
     </div>
   );
+}
+
+function getAuthHeader(): string {
+  throw new Error('Function not implemented.');
 }

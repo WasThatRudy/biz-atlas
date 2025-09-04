@@ -85,9 +85,9 @@ function SetupContent() {
           
           setError(errorMessage);
         } else {
-          // Store competitors data and redirect to competitors page
+          // Store competitors data and redirect to competitors page with path parameter
           localStorage.setItem('competitors_data', JSON.stringify(data));
-          router.push('/competitors');
+          router.push(`/competitors?path=${path}`);
         }
       } else {
         setError(data.error || 'Failed to find competitors. Please try again.');
